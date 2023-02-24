@@ -26,25 +26,6 @@
 #define LANE_1_FINISH_PIN 1
 #define LANE_2_FINISH_PIN 4
 
-#define STATE_IDLE 0
-#define STATE_IDLE_WAIT 1
-#define STATE_CALIBRATE_ANALOG 2
-#define STATE_STARTING 3
-#define STATE_STARTING_WAIT 4
-#define STATE_RUNNING 5
-#define STATE_RUNNING_WAIT 6
-#define STATE_PRE_START_FAILED 7
-#define STATE_FALSE_START 8
-#define STATE_FINISHED 9
-#define STATE_FINISHED_WAIT 10
-#define STATE_TEST_GATE 11
-#define STATE_TEST_CALIBRATE_ANALOG 12
-#define STATE_TEST_MONITOR_ANALOG 13
-
-#define STATE_BUTTON_UP 0
-#define STATE_BUTTON_DOWN 1
-#define STATE_BUTTON_LONG 2
-
 #define LONG_PRESS_DURATION 2000
 
 //Debug symbols.
@@ -52,12 +33,34 @@
 #define LOG_DEBUG 9
 #define LOG_EVENTS 8
 
-/****************
+/**************************
  *
  * STRUCTS, ENUMS
  *
- ****************/
+ *************************/
 
+enum timer_state {
+  STATE_IDLE,
+  STATE_IDLE_WAIT,
+  STATE_CALIBRATE_ANALOG,
+  STATE_STARTING,
+  STATE_STARTING_WAIT,
+  STATE_RUNNING,
+  STATE_RUNNING_WAIT,
+  STATE_PRE_START_FAILED,
+  STATE_FALSE_START,
+  STATE_FINISHED,
+  STATE_FINISHED_WAIT,
+  STATE_TEST_GATE,
+  STATE_TEST_CALIBRATE_ANALOG,
+  STATE_TEST_MONITOR_ANALOG,
+};
+
+enum button_state {
+  STATE_BUTTON_UP,
+  STATE_BUTTON_DOWN,
+  STATE_BUTTON_LONG,
+};
 
 struct discrete_input {
   long debounce_delay;
