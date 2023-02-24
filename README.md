@@ -26,3 +26,11 @@ This is the combination of the above two works
 ## PCB
 
 TODO: the board design files
+
+# Compilation
+
+open the mrgtimer\_firmware project in the arduino ide
+
+this can be done with `make gui` (read the Makefile for instructions)
+
+hopefully i have time to make this work with arduino-cli

@@ -6,14 +6,15 @@
 ####################################
 
 # set this to your installation dir
-# TODO use arduino cli... arduino-builder sucks
-# the gui is also not great but whatever
 ARDUINO_INSTALL_DIR ?= ~/Software/arduino-1.8.19
 
 ######################
 # DERIVED PARAMETERS
 # don't edit these
 ######################
+
+# TODO use arduino cli... arduino-builder sucks
+# the gui is also not great but whatever
 
 ARDUINO_GUI := $(ARDUINO_INSTALL_DIR)/arduino
 .PHONY: gui
