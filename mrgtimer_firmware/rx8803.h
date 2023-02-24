@@ -126,5 +126,9 @@ uint16_t rx8803_encode_timer_counter(uint16_t in, uint8_t *tc1, uint8_t *tc0);
 uint8_t dec2bcd(uint8_t in);
 uint8_t bcd2dec(uint8_t in);
 
+void rx8803_start_counter();
+void rx8803_stop_counter();
+long unsigned int rx8803_get_count();
+void rx8803_init(int pin);
 
 #endif

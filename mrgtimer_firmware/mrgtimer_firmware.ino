@@ -12,13 +12,15 @@
 #define PULSE_BUFFER_SIZE 16
 #define NUMBER_LANES 1
 
+#define TIMER_CLK_PIN 2
+
 #define GATE_LIGHT_PIN 3
 #define STARTER_LIGHT_PIN 4
-#define STARTER_BUTTON_PIN 5
+#define STARTER_BUTTON_PIN 9
 
 #define LIGHT_FALSE_START_PIN 6
 #define LANE_1_FALSE_START_PIN 1
-#define LANE_2_FALSE_START_PIN 2
+#define LANE_2_FALSE_START_PIN 2 // TODO i dont think this matches current schem
 
 #define LIGHT_FINISH_PIN 9
 #define LANE_1_FINISH_PIN 1
@@ -121,6 +123,7 @@ volatile bool light_state = false;
 unsigned long sweep_time;
 unsigned long last_time;
 
+DFRobot_RGBLCD1602 lcd(/*lcdCols*/16,/*lcdRows*/2);  //16 characters and 2 lines of show
 /****************
  *
  * FUNCTIONS
@@ -128,8 +131,9 @@ unsigned long last_time;
  ****************/
 
 void setup() {
-  Serial.begin(2000000);
+  Serial.begin(9600);
   // pin configurations:
+  pinMode(TIMER_CLK_PIN, INPUT);
   pinMode(STARTER_BUTTON_PIN, INPUT_PULLUP);
   pinMode(LANE_1_FALSE_START_PIN, INPUT_PULLUP);
   pinMode(LANE_2_FALSE_START_PIN, INPUT_PULLUP);
@@ -138,6 +142,8 @@ void setup() {
 
   pinMode(GATE_LIGHT_PIN, OUTPUT);
   pinMode(STARTER_LIGHT_PIN, OUTPUT);
+
+  rx8803_init(TIMER_CLK_PIN);
 
   state = STATE_IDLE;
 

@@ -1,5 +1,22 @@
 #include <stdint.h>
+#include "Arduino.h"
 #include "rx8803.h"
+
+/****************
+ *
+ * GLOBAL VARS
+ *
+ ****************/
+static int _pin = 0;
+static unsigned long int _count = 0;
+
+
+
+/****************
+ *
+ * REGISTER FUNCTIONS
+ *
+ ****************/
 
 uint8_t bcd2dec(uint8_t in) {
 	return 10*(in>>4) + (0x0F & in);
@@ -98,4 +115,37 @@ uint16_t rx8803_encode_timer_counter(uint16_t in, uint8_t *tc1, uint8_t *tc0)
 		*tc1 = (in >> 8);
 
 	return 0;
+}
+
+/****************
+ *
+ * GENERAL FUNCTIONS
+ *
+ ****************/
+
+static void rx8803_count() {
+  _count++;
+}
+
+void rx8803_init(int pin)
+{
+  _pin = pin;
+}
+
+void rx8803_start_counter() 
+{
+  _count = 0;
+  if (_pin)
+    attachInterrupt(digitalPinToInterrupt(_pin), rx8803_count, RISING);
+}
+
+void rx8803_stop_counter() 
+{
+  if (_pin)
+    detachInterrupt(digitalPinToInterrupt(_pin));
+}
+
+long unsigned int rx8803_get_count() 
+{
+  return _count;
 }
