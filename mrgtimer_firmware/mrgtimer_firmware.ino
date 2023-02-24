@@ -1,6 +1,6 @@
 #include <string.h>
-#include "DFRobot_RGBLCD1602.h"
 #include "rx8803.h"
+#include "lcd.h"
 
 /****************
  *
@@ -108,7 +108,7 @@ char* c = new char[80];
 
 //struct analog_gate *analog_gates[ANALOG_CHANNEL_COUNT];
 
-int state;
+enum timer_state state;
 
 unsigned long step_time;
 bool test_last_value = false;
@@ -126,7 +126,7 @@ volatile bool light_state = false;
 unsigned long sweep_time;
 unsigned long last_time;
 
-DFRobot_RGBLCD1602 lcd(/*lcdCols*/16,/*lcdRows*/2);  //16 characters and 2 lines of show
+
 /****************
  *
  * FUNCTIONS
@@ -147,6 +147,7 @@ void setup() {
   pinMode(STARTER_LIGHT_PIN, OUTPUT);
 
   rx8803_init(TIMER_CLK_PIN);
+  lcd_init();
 
   state = STATE_IDLE;
 
