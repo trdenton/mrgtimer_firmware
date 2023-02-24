@@ -1,4 +1,13 @@
 #include <string.h>
+#include "DFRobot_RGBLCD1602.h"
+#include "rx8803.h"
+
+/****************
+ *
+ * DEFINES
+ *
+ ****************/
+
 
 #define PULSE_BUFFER_SIZE 16
 #define NUMBER_LANES 1
@@ -41,6 +50,12 @@
 #define LOG_DEBUG 9
 #define LOG_EVENTS 8
 
+/****************
+ *
+ * STRUCTS, ENUMS
+ *
+ ****************/
+
 
 struct discrete_input {
   long debounce_delay;
@@ -74,6 +89,15 @@ struct race_lane {
   char title;
 };
 
+
+/****************
+ *
+ * GLOBAL VARS
+ *
+ ****************/
+
+
+
 race_lane lane[NUMBER_LANES];
 char* c = new char[80];
 
@@ -96,6 +120,12 @@ volatile bool light_state = false;
 
 unsigned long sweep_time;
 unsigned long last_time;
+
+/****************
+ *
+ * FUNCTIONS
+ *
+ ****************/
 
 void setup() {
   Serial.begin(2000000);
@@ -377,14 +407,14 @@ void analogMonitor(struct analog_gate *ag) {
   ag->pulse_buffer[ag->pulse_index] = analogRead(ag->pin);
 
   /*
-    sprintf(c, "ch %d ", ag->pin);
-    for (int i = 0; i < PULSE_BUFFER_SIZE; i++) {
-    k = (ag->pulse_index + PULSE_BUFFER_SIZE - i) % PULSE_BUFFER_SIZE;
-    sprintf(c + strlen(c), "%d ", ag->pulse_buffer[k]);
-    }
-    sprintf(c + strlen(c), " (%02d) -  ", ag->pulse_index);
-    Serial.println(c);
-  */
+     sprintf(c, "ch %d ", ag->pin);
+     for (int i = 0; i < PULSE_BUFFER_SIZE; i++) {
+     k = (ag->pulse_index + PULSE_BUFFER_SIZE - i) % PULSE_BUFFER_SIZE;
+     sprintf(c + strlen(c), "%d ", ag->pulse_buffer[k]);
+     }
+     sprintf(c + strlen(c), " (%02d) -  ", ag->pulse_index);
+     Serial.println(c);
+   */
 
   if (ag->threshold > 0) {
     // determine the average value
@@ -520,106 +550,3 @@ void debounce(struct discrete_input *di) {
 
   di->last_value = b;
 }
-
-
-/*
-  lane[1].false_start_sensor.pin = LANE_2_FALSE_START_PIN;
-  lane[1].false_start_sensor.pulse_index = 0;
-  lane[1].false_start_sensor.value = true;
-
-  lane[1].finish_line_sensor.pin = LANE_2_FINISH_PIN;
-  lane[1].finish_line_sensor.pulse_index = 0;
-  lane[1].finish_line_sensor.value = true;
-  lane[1].title = '2';
-*/
-
-/*
-  //pinMode(11, OUTPUT);
-  //TCCR2A = _BV(COM2A1) | _BV(COM2B1) | _BV(WGM21) | _BV(WGM20);
-  //TCCR2B = _BV(CS22);
-  //OCR2A = 200;
-  //OCR2B = 60;
-
-  // Init ADC free-run mode; f = ( 16MHz/prescaler ) / 13 cycles/conversion
-  ADMUX  = analog_gates[0]->pin; // Channel sel, right-adj, use AREF pin
-  ADCSRA = _BV(ADEN)  | // ADC enable
-         _BV(ADSC)  | // ADC start
-         _BV(ADATE) | // Auto trigger
-         _BV(ADIE)  | // Interrupt enable
-         _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0); // 128:1 / 13 = 9615 Hz
-  ADCSRB = 0;                // Free run mode, no high MUX bit
-
-  DIDR0      = 1 << LANE_1_FALSE_START_PIN // Turn off digital input for ADC pins
-           | 1 << LANE_1_FINISH_PIN
-           | 1 << LANE_2_FALSE_START_PIN
-           | 1 << LANE_2_FINISH_PIN;
-
-  TIMSK0 = 0;  // Timer0 off
-
-  sei(); // Enable interrupts
-*/
-
-/*
-  Sampling interupt
-   - Cycles through the sensor pins, taking FFT_N audio samples and a single
-     sample of all others.
-*/
-
-/*ISR(ADC_vect) {
-
-  digitalWrite(GATE_LIGHT_PIN, light_state);
-
-  analog_gates[current_channel]->pulse_index++;
-  analog_gates[current_channel]->pulse_index %= PULSE_BUFFER_SIZE;
-  analog_gates[current_channel]->pulse_buffer[analog_gates[current_channel]->pulse_index] = ADC;
-  analog_gates[current_channel]->processed = false; //queue this channel for state re-processing
-
-  if (!light_state) {
-    //light is now off, go to next channel.
-
-    //change channels
-    current_channel++;
-    current_channel %= ANALOG_CHANNEL_COUNT;
-    light_state = false;
-
-    // Turn off interrupts to report back and switch pins
-    ADCSRA &= ~_BV(ADIE);
-    ADMUX = bit (REFS0) | (analog_gates[current_channel]->pin & 0x07);
-    ADCSRA |= _BV(ADIE);
-  }
-*/
-
-/*
-   else if (STATE_TEST_CALIBRATE_ANALOG == state) {
-   delay(1);
-   cycle++;
-   if (cycle > PULSE_BUFFER_SIZE) {
-     calibrateAnalog(&lane[0].false_start_sensor);
-     state = STATE_TEST_MONITOR_ANALOG;
-     Serial.println("STATE: STATE_TEST_MONITOR_ANALOG");
-   }
-   }
-
-   else if (STATE_TEST_MONITOR_ANALOG == state) {
-   if (lane[0].false_start_sensor.value != test_last_value) {
-     test_last_value = lane[0].false_start_sensor.value;
-
-     sprintf(c, "%lu - V: %d (%d) %d - ", current_time, lane[0].false_start_sensor.value, change_counter, lane[0].false_start_sensor.threshold);
-     for (int i = 0; i < PULSE_BUFFER_SIZE; i++) {
-       int j = (lane[0].false_start_sensor.pulse_index + PULSE_BUFFER_SIZE + i -1) % PULSE_BUFFER_SIZE;
-       sprintf(c + strlen(c), "%d ", lane[0].false_start_sensor.pulse_buffer[j]);
-     }
-     Serial.println(c);
-     change_counter++;
-   }
-
-
-   if (0 < start_button.short_presses) {
-     start_button.short_presses = 0;
-     Serial.println("STATE: IDLE");
-     state = STATE_IDLE_WAIT;
-   }
-   }
-*/
-
-
