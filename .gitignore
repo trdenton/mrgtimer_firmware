@@ -1,3 +1,8 @@
+# Editor stuff
+*.swp
+*.swo
+tags
+
 # Prerequisites
 *.d
 

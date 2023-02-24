@@ -183,9 +183,6 @@ void loop() {
   sweep_time = micros() - last_time;
   last_time = micros();
 
-  //sprintf(c, "Sweep: %u", sweep_time);
-  //Serial.println(c);
-
   //condition the start button
   debounce(&start_button);
 
@@ -416,16 +413,6 @@ void analogMonitor(struct analog_gate *ag) {
   ag->pulse_index %= PULSE_BUFFER_SIZE;
   ag->pulse_buffer[ag->pulse_index] = analogRead(ag->pin);
 
-  /*
-     sprintf(c, "ch %d ", ag->pin);
-     for (int i = 0; i < PULSE_BUFFER_SIZE; i++) {
-     k = (ag->pulse_index + PULSE_BUFFER_SIZE - i) % PULSE_BUFFER_SIZE;
-     sprintf(c + strlen(c), "%d ", ag->pulse_buffer[k]);
-     }
-     sprintf(c + strlen(c), " (%02d) -  ", ag->pulse_index);
-     Serial.println(c);
-   */
-
   if (ag->threshold > 0) {
     // determine the average value
     avg_all = 0;
@@ -459,8 +446,6 @@ void analogMonitor(struct analog_gate *ag) {
     }
 
     //Check and see if we've seen a recent pulse
-    //sprintf(c, "cycles since last pulse: %d", k);
-    //Serial.println(c);
     if (k > 6) {
       ag->break_time = millis();
       ag->value = 0;
@@ -485,8 +470,6 @@ void debounce(struct discrete_input *di) {
 
   if (b && di->last_value) {
     di->count += sweep_time;
-    //sprintf(c, "added %lu to pin %d count. now: %ld", sweep_time, di->pin, di->count);
-    //Serial.println(c);
   }
   else if (!b && di->last_value) {
     di->count -= sweep_time / 2;
@@ -496,8 +479,6 @@ void debounce(struct discrete_input *di) {
   }
   else if (!b && !di->last_value) {
     di->count -= sweep_time;
-    //sprintf(c, "subtracted %lu to pin %d count. now: %ld", sweep_time, di->pin, di->count);
-    //Serial.println(c);
   }
 
   // clamp the di.count variable.
@@ -509,9 +490,6 @@ void debounce(struct discrete_input *di) {
   }
 
   // flip the bit if the count exceeds the thresdhold.
-  //sprintf(c, "Pin %d count is: %ld, value is %ld", di->pin, di->count, di->value);
-  //sprintf(c, "count is %ld", di->count);
-  //Serial.println(c);
   if (STATE_BUTTON_DOWN == di->state) {
     if (di->debounce_delay == di->count) {
       di->value = true;
