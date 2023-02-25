@@ -173,6 +173,8 @@ void setup() {
   lane[0].title = '1';
 
   last_time = micros();
+  lcd_message("MRGTimer v0.1");
+  delay(3000);
 }
 
 
@@ -216,6 +218,7 @@ void loop() {
 
       state = STATE_CALIBRATE_ANALOG;
       Serial.println("STATE: STATE_CALIBRATE_ANALOG");
+      lcd_message("Calibrating...");
       cycle = 0;
     }
   }
@@ -246,7 +249,7 @@ void loop() {
         b = 0;
       }
       if (!lane[i].false_start_sensor.value) {
-        sprintf(c, "lane %c false start sensor obstructed");
+        sprintf(c, "lane %c false start sensor obstructed", lane[i].title);
         Serial.println(c);
         b = 0;
       }

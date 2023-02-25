@@ -30,7 +30,6 @@ long unsigned int lcd_print_time(long unsigned int t)
 void lcd_init() 
 {
   lcd.init();
-  lcd.print("MRGTimer v0.1");
 }
 
 void lcd_clear()
