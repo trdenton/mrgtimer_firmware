@@ -7,16 +7,30 @@
 
 # set this to your installation dir
 ARDUINO_INSTALL_DIR ?= ~/Software/arduino-1.8.19
+ARDUINO_CLI ?= ~/Software/arduino-cli
 
 ######################
 # DERIVED PARAMETERS
 # don't edit these
 ######################
 
-# TODO use arduino cli... arduino-builder sucks
-# the gui is also not great but whatever
+ACLI := $(ARDUINO_CLI)
+
+# if it's in the path, use that one
+ifneq ($(shell which arduino-cli),)
+ACLI := $(shell which arduino-cli)
+endif
 
 ARDUINO_GUI := $(ARDUINO_INSTALL_DIR)/arduino
+
+.PHONY: verify
+verify:
+	$(ACLI) compile --fqbn arduino:avr:nano mrgtimer_firmware
+
+.PHONY: upload
+upload:
+	$(ACLI) upload -P avrispmkii --fqbn arduino:avr:nano mrgtimer_firmware
+
 .PHONY: gui
 gui:
-	$(ARDUINO_GUI) mrgtimer_firmware/mrgtimer_firmware.ino 
+	$(ARDUINO_GUI) mrgtimer_firmware/mrgtimer_firmware.ino
