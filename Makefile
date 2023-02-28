@@ -34,3 +34,9 @@ upload:
 .PHONY: gui
 gui:
 	$(ARDUINO_GUI) mrgtimer_firmware/mrgtimer_firmware.ino
+
+
+# youll want to go to config > auto crlf
+.PHONY: term 
+term:
+	gtkterm -e --port /dev/ttyUSB0 --speed $(shell grep Serial.begin mrgtimer_firmware/mrgtimer_firmware.ino | sed -e 's/.*(//;s/).*//;') &
