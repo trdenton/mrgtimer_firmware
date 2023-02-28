@@ -23,9 +23,9 @@ This is some work done by Troy, wholly ignorant of the previous work done by Bru
 
 This is the functioning sketch, a combination of the above two works
 
-## PCB
+## kicad
 
-TODO: the board design files
+board design files
 
 # Compilation
 
