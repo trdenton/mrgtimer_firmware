@@ -1,0 +1,327 @@
+EESchema Schematic File Version 4
+LIBS:gate board-cache
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector:8P8C J1
+U 1 1 5C7479C5
+P 2550 1100
+F 0 "J1" H 2220 1104 50  0000 R CNN
+F 1 "8P8C" H 2220 1195 50  0000 R CNN
+F 2 "Connector_RJ:RJ45_Amphenol_54602-x08_Horizontal" V 2550 1125 50  0001 C CNN
+F 3 "~" V 2550 1125 50  0001 C CNN
+	1    2550 1100
+	1    0    0    1   
+$EndComp
+Text Notes 700  1200 0    50   ~ 0
++12V\nSTART LIGHT/WINNER LIGHT\nBEAM DETECT\nBEAM EXCITE\nCHIPSEL\nSERA\nCLK\nGND
+$Comp
+L power:+12V #PWR0101
+U 1 1 5C74A85D
+P 2950 800
+F 0 "#PWR0101" H 2950 650 50  0001 C CNN
+F 1 "+12V" H 2965 973 50  0000 C CNN
+F 2 "" H 2950 800 50  0001 C CNN
+F 3 "" H 2950 800 50  0001 C CNN
+	1    2950 800 
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0102
+U 1 1 5C74A8C1
+P 2950 1500
+F 0 "#PWR0102" H 2950 1250 50  0001 C CNN
+F 1 "GND" H 2955 1327 50  0000 C CNN
+F 2 "" H 2950 1500 50  0001 C CNN
+F 3 "" H 2950 1500 50  0001 C CNN
+	1    2950 1500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Regulator_Switching:R-78E5.0-0.5 U1
+U 1 1 5C74AD8B
+P 5450 1150
+F 0 "U1" H 5450 1392 50  0000 C CNN
+F 1 "R-78E5.0-0.5" H 5450 1301 50  0000 C CNN
+F 2 "Converter_DCDC:Converter_DCDC_RECOM_R-78E-0.5_THT" H 5500 900 50  0001 L CIN
+F 3 "https://www.recom-power.com/pdf/Innoline/R-78Exx-0.5.pdf" H 5450 1150 50  0001 C CNN
+	1    5450 1150
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+12V #PWR0103
+U 1 1 5C74AE36
+P 5150 1150
+F 0 "#PWR0103" H 5150 1000 50  0001 C CNN
+F 1 "+12V" H 5165 1323 50  0000 C CNN
+F 2 "" H 5150 1150 50  0001 C CNN
+F 3 "" H 5150 1150 50  0001 C CNN
+	1    5150 1150
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR0104
+U 1 1 5C74B019
+P 5450 1450
+F 0 "#PWR0104" H 5450 1200 50  0001 C CNN
+F 1 "GND" H 5455 1277 50  0000 C CNN
+F 2 "" H 5450 1450 50  0001 C CNN
+F 3 "" H 5450 1450 50  0001 C CNN
+	1    5450 1450
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0105
+U 1 1 5C74B048
+P 5750 1150
+F 0 "#PWR0105" H 5750 1000 50  0001 C CNN
+F 1 "+5V" V 5765 1278 50  0000 L CNN
+F 2 "" H 5750 1150 50  0001 C CNN
+F 3 "" H 5750 1150 50  0001 C CNN
+	1    5750 1150
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:CP1 C1
+U 1 1 5C74B15A
+P 3750 1050
+F 0 "C1" H 3865 1096 50  0000 L CNN
+F 1 "1000uF" H 3865 1005 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm" H 3750 1050 50  0001 C CNN
+F 3 "~" H 3750 1050 50  0001 C CNN
+	1    3750 1050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+12V #PWR0106
+U 1 1 5C74B41C
+P 3750 900
+F 0 "#PWR0106" H 3750 750 50  0001 C CNN
+F 1 "+12V" H 3765 1073 50  0000 C CNN
+F 2 "" H 3750 900 50  0001 C CNN
+F 3 "" H 3750 900 50  0001 C CNN
+	1    3750 900 
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0107
+U 1 1 5C74B497
+P 3750 1200
+F 0 "#PWR0107" H 3750 950 50  0001 C CNN
+F 1 "GND" H 3755 1027 50  0000 C CNN
+F 2 "" H 3750 1200 50  0001 C CNN
+F 3 "" H 3750 1200 50  0001 C CNN
+	1    3750 1200
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:CP1 C2
+U 1 1 5C74B4D0
+P 6300 1200
+F 0 "C2" H 6415 1246 50  0000 L CNN
+F 1 "100uF" H 6415 1155 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm" H 6300 1200 50  0001 C CNN
+F 3 "~" H 6300 1200 50  0001 C CNN
+	1    6300 1200
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0108
+U 1 1 5C74B52B
+P 6300 1050
+F 0 "#PWR0108" H 6300 900 50  0001 C CNN
+F 1 "+5V" H 6315 1223 50  0000 C CNN
+F 2 "" H 6300 1050 50  0001 C CNN
+F 3 "" H 6300 1050 50  0001 C CNN
+	1    6300 1050
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0109
+U 1 1 5C74B5C9
+P 6300 1350
+F 0 "#PWR0109" H 6300 1100 50  0001 C CNN
+F 1 "GND" H 6305 1177 50  0000 C CNN
+F 2 "" H 6300 1350 50  0001 C CNN
+F 3 "" H 6300 1350 50  0001 C CNN
+	1    6300 1350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Screw_Terminal_01x02 J2
+U 1 1 5C74B684
+P 7600 1150
+F 0 "J2" H 7679 1142 50  0000 L CNN
+F 1 "beam excite" H 7679 1051 50  0000 L CNN
+F 2 "Connector_Phoenix_MSTB:PhoenixContact_MSTBV_2,5_2-GF_1x02_P5.00mm_Vertical_ThreadedFlange" H 7600 1150 50  0001 C CNN
+F 3 "~" H 7600 1150 50  0001 C CNN
+	1    7600 1150
+	1    0    0    -1  
+$EndComp
+Text Label 7400 3250 2    50   ~ 0
+start_light
+Text Label 2950 1000 0    50   ~ 0
+beam_detect
+Text Label 2950 1100 0    50   ~ 0
+beam_excite
+Text Label 2950 1200 0    50   ~ 0
+chipsel
+Text Label 2950 1300 0    50   ~ 0
+SERA
+Text Label 2950 1400 0    50   ~ 0
+CLK
+Text Label 7400 1150 2    50   ~ 0
+beam_excite
+$Comp
+L Connector:Screw_Terminal_01x02 J3
+U 1 1 5C74B878
+P 7600 1850
+F 0 "J3" H 7680 1842 50  0000 L CNN
+F 1 "beam detect" H 7680 1751 50  0000 L CNN
+F 2 "Connector_Phoenix_MSTB:PhoenixContact_MSTBV_2,5_2-GF_1x02_P5.00mm_Vertical_ThreadedFlange" H 7600 1850 50  0001 C CNN
+F 3 "~" H 7600 1850 50  0001 C CNN
+	1    7600 1850
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0112
+U 1 1 5C74B90C
+P 7400 1850
+F 0 "#PWR0112" H 7400 1700 50  0001 C CNN
+F 1 "+5V" H 7415 2023 50  0000 C CNN
+F 2 "" H 7400 1850 50  0001 C CNN
+F 3 "" H 7400 1850 50  0001 C CNN
+	1    7400 1850
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Screw_Terminal_01x02 J4
+U 1 1 5C74B95F
+P 7600 2500
+F 0 "J4" H 7680 2492 50  0000 L CNN
+F 1 "light" H 7680 2401 50  0000 L CNN
+F 2 "Connector_Phoenix_MSTB:PhoenixContact_MSTBV_2,5_2-GF_1x02_P5.00mm_Vertical_ThreadedFlange" H 7600 2500 50  0001 C CNN
+F 3 "~" H 7600 2500 50  0001 C CNN
+	1    7600 2500
+	1    0    0    -1  
+$EndComp
+Text Label 7400 2500 2    50   ~ 0
+start_light
+$Comp
+L power:+12V #PWR0114
+U 1 1 5C74BB81
+P 7400 3050
+F 0 "#PWR0114" H 7400 2900 50  0001 C CNN
+F 1 "+12V" V 7415 3178 50  0000 L CNN
+F 2 "" H 7400 3050 50  0001 C CNN
+F 3 "" H 7400 3050 50  0001 C CNN
+	1    7400 3050
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:+5V #PWR0115
+U 1 1 5C74BBD4
+P 7400 3150
+F 0 "#PWR0115" H 7400 3000 50  0001 C CNN
+F 1 "+5V" V 7415 3278 50  0000 L CNN
+F 2 "" H 7400 3150 50  0001 C CNN
+F 3 "" H 7400 3150 50  0001 C CNN
+	1    7400 3150
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR0116
+U 1 1 5C74BC7E
+P 7400 3750
+F 0 "#PWR0116" H 7400 3500 50  0001 C CNN
+F 1 "GND" V 7405 3622 50  0000 R CNN
+F 2 "" H 7400 3750 50  0001 C CNN
+F 3 "" H 7400 3750 50  0001 C CNN
+	1    7400 3750
+	0    1    1    0   
+$EndComp
+Text Label 7400 3350 2    50   ~ 0
+chipsel
+Text Label 7400 3450 2    50   ~ 0
+SERA
+Text Label 7400 3550 2    50   ~ 0
+CLK
+$Comp
+L Connector:Screw_Terminal_01x08 J5
+U 1 1 5C74BE8F
+P 7600 3350
+F 0 "J5" H 7680 3342 50  0000 L CNN
+F 1 "Board" H 7680 3251 50  0000 L CNN
+F 2 "Connector_Phoenix_MSTB:PhoenixContact_MSTBV_2,5_8-GF_1x08_P5.00mm_Vertical_ThreadedFlange" H 7600 3350 50  0001 C CNN
+F 3 "~" H 7600 3350 50  0001 C CNN
+	1    7600 3350
+	1    0    0    -1  
+$EndComp
+Text Label 2950 900  0    50   ~ 0
+start_light
+Text Label 7400 1950 2    50   ~ 0
+beam_detect
+$Comp
+L power:+12V #PWR0110
+U 1 1 5C7C5C2A
+P 7400 1250
+F 0 "#PWR0110" H 7400 1100 50  0001 C CNN
+F 1 "+12V" V 7415 1378 50  0000 L CNN
+F 2 "" H 7400 1250 50  0001 C CNN
+F 3 "" H 7400 1250 50  0001 C CNN
+	1    7400 1250
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:+12V #PWR0111
+U 1 1 5C7C5CBB
+P 7400 2600
+F 0 "#PWR0111" H 7400 2450 50  0001 C CNN
+F 1 "+12V" V 7415 2728 50  0000 L CNN
+F 2 "" H 7400 2600 50  0001 C CNN
+F 3 "" H 7400 2600 50  0001 C CNN
+	1    7400 2600
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:PWR_FLAG #FLG0101
+U 1 1 5E55A8F0
+P 3275 800
+F 0 "#FLG0101" H 3275 875 50  0001 C CNN
+F 1 "PWR_FLAG" H 3275 973 50  0000 C CNN
+F 2 "" H 3275 800 50  0001 C CNN
+F 3 "~" H 3275 800 50  0001 C CNN
+	1    3275 800 
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3275 800  2950 800 
+Connection ~ 2950 800 
+$Comp
+L power:PWR_FLAG #FLG0102
+U 1 1 5E55E34D
+P 3300 1500
+F 0 "#FLG0102" H 3300 1575 50  0001 C CNN
+F 1 "PWR_FLAG" H 3300 1673 50  0000 C CNN
+F 2 "" H 3300 1500 50  0001 C CNN
+F 3 "~" H 3300 1500 50  0001 C CNN
+	1    3300 1500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3300 1500 2950 1500
+Connection ~ 2950 1500
+NoConn ~ 7400 3650
+$EndSCHEMATC

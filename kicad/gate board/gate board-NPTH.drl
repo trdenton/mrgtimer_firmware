@@ -1,0 +1,14 @@
+M48
+;DRILL file {KiCad 5.0.2} date Sat 02 Mar 2019 07:01:34 PM CST
+;FORMAT={-:-/ absolute / inch / decimal}
+FMAT,2
+INCH,TZ
+T1C0.1260
+%
+G90
+G05
+T1
+X0.95Y-1.2
+X0.95Y-1.65
+T0
+M30
