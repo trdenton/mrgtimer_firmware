@@ -9,6 +9,8 @@
  ****************/
 
 
+#define WTF(_X_) do {Serial.print("Something weird on ");Serial.print(__LINE__);Serial.print(": ");Serial.println(_X_);} while(0);
+
 #define PULSE_BUFFER_SIZE 16
 #define NUMBER_LANES 1
 
@@ -33,6 +35,8 @@
 #define LOG_DEBUG 9
 #define LOG_EVENTS 8
 
+#define RX_BUFF_LEN (256)
+
 /**************************
  *
  * STRUCTS, ENUMS
@@ -40,20 +44,21 @@
  *************************/
 
 enum timer_state {
-  STATE_IDLE,
-  STATE_IDLE_WAIT,
-  STATE_CALIBRATE_ANALOG,
-  STATE_STARTING,
-  STATE_STARTING_WAIT,
-  STATE_RUNNING,
-  STATE_RUNNING_WAIT,
-  STATE_PRE_START_FAILED,
-  STATE_FALSE_START,
-  STATE_FINISHED,
-  STATE_FINISHED_WAIT,
-  STATE_TEST_GATE,
-  STATE_TEST_CALIBRATE_ANALOG,
-  STATE_TEST_MONITOR_ANALOG,
+  STATE_IDLE,             // 0  
+  STATE_IDLE_WAIT,        // 1
+  STATE_CALIBRATE_ANALOG, // 2
+  STATE_STARTING,         // 3
+  STATE_STARTING_WAIT,    // 4
+  STATE_RUNNING,          // 5
+  STATE_RUNNING_WAIT,     // 6
+  STATE_PRE_START_FAILED, // 7
+  STATE_FALSE_START,      // 8
+  STATE_FINISHED,         // 9
+  STATE_FINISHED_WAIT,    // 10
+  STATE_TEST_GATE,        // 11
+  STATE_TEST_CALIBRATE_ANALOG,  // 12
+  STATE_TEST_MONITOR_ANALOG,    // 13
+  NUM_TIMER_STATES
 };
 
 enum button_state {
@@ -102,6 +107,10 @@ struct race_lane {
  ****************/
 
 
+// receiving commands
+bool stringComplete = false;
+char buff[RX_BUFF_LEN] = {0};
+int buff_idx = 0;
 
 race_lane lane[NUMBER_LANES];
 char* c = new char[80];
@@ -126,6 +135,23 @@ volatile bool light_state = false;
 unsigned long sweep_time;
 unsigned long last_time;
 
+const char* states[] = {
+  "STATE_IDLE",
+  "STATE_IDLE_WAIT",
+  "STATE_CALIBRATE_ANALOG",
+  "STATE_STARTING",
+  "STATE_STARTING_WAIT",
+  "STATE_RUNNING",
+  "STATE_RUNNING_WAIT",
+  "STATE_PRE_START_FAILED",
+  "STATE_FALSE_START",
+  "STATE_FINISHED",
+  "STATE_FINISHED_WAIT",
+  "STATE_TEST_GATE",
+  "STATE_TEST_CALIBRATE_ANALOG",
+  "STATE_TEST_MONITOR_ANALOG"
+};
+
 
 /****************
  *
@@ -133,8 +159,19 @@ unsigned long last_time;
  *
  ****************/
 
+void announce_state() {
+  static enum timer_state last;
+  static int first = 1;
+
+  if ((last != state) || first) {
+    Serial.print("STATE: "); Serial.println(states[state]);
+    first = 0;
+  }
+  last = state;
+}
+
 void setup() {
-  Serial.begin(19200);
+  Serial.begin(9600); //119200
   // pin configurations:
   pinMode(TIMER_CLK_PIN, INPUT);
   pinMode(STARTER_BUTTON_PIN, INPUT_PULLUP);
@@ -181,6 +218,8 @@ void setup() {
 void loop() {
   bool b;
 
+  announce_state();
+
   //get the sweep time in us.
   sweep_time = micros() - last_time;
   last_time = micros();
@@ -209,16 +248,15 @@ void loop() {
     start_button.short_presses = 0;
 
     state = STATE_IDLE_WAIT;
-    Serial.println("STATE: IDLE");
+    lcd_message("IDLE");
   }
 
   else if (STATE_IDLE_WAIT == state) {
     if (0 < start_button.short_presses) {
+      lcd_message("Calibrating...");
       // Start button pressed, transition to the starting state
 
       state = STATE_CALIBRATE_ANALOG;
-      Serial.println("STATE: STATE_CALIBRATE_ANALOG");
-      lcd_message("Calibrating...");
       cycle = 0;
     }
   }
@@ -232,7 +270,6 @@ void loop() {
       }
       state = STATE_STARTING;
       step_time = millis();
-      Serial.println("STATE: STATE_STARTING");
     }
   }
 
@@ -259,7 +296,6 @@ void loop() {
       // All sensors reading correctly
       step_time = random(3000, 5000); // This is when the race will start.[]6
       state = STATE_STARTING_WAIT;
-      Serial.println("STATE: STARTING");
       sprintf(c, "Start delay is %i ms", step_time);
       Serial.println(c);
       step_time += millis();
@@ -299,7 +335,6 @@ void loop() {
       lane[i].finish_time = -1;
     }
 
-    Serial.println("STATE: RUNNING");
     state = STATE_RUNNING_WAIT;
     step_time = millis();
 
@@ -345,7 +380,6 @@ void loop() {
     }
     if (done) {
       state = STATE_FINISHED;
-      Serial.println("STATE: FINISHED");
     }
   }
 
@@ -370,6 +404,12 @@ void loop() {
   else if (STATE_FALSE_START == state) {
     // Somebody jumped the gun.
     state = STATE_IDLE;
+  }
+
+  // this is populated by serialEvent()
+  if (stringComplete) {
+    processCommand();
+    stringComplete = false;
   }
 }
 
@@ -540,4 +580,92 @@ void debounce(struct discrete_input *di) {
   }
 
   di->last_value = b;
+}
+
+
+// every command must be one line
+void serialEvent() {
+  static char lastChar;
+  while (Serial.available()) {
+
+    // get the new byte:
+    char inChar = (char)Serial.read();
+
+    // commands can end in \r or \n or any combo
+    if (inChar == '\r' || inChar == '\n') {
+      stringComplete = true;
+    } else {
+      buff[buff_idx] = inChar;
+      buff_idx++;
+      if (buff_idx == RX_BUFF_LEN) {
+        // this really shouldnt happen....
+        WTF("shouldnt see input buffer max out");
+        reset_buff();
+      }
+    }
+    // if the incoming character is a carriage return (0x0D), set a flag so the main loop can
+    // do something about it:
+    lastChar = inChar;
+  }
+}
+
+
+void ack() {
+  Serial.println("ACK");
+}
+
+void nack() {
+  Serial.println("NACK");
+}
+
+void reset_buff() {
+  memset(buff,0,RX_BUFF_LEN);
+  buff_idx = 0;
+}
+
+void processCommand() {
+  int new_state = 0;
+  int valid = 0;
+
+  // "state: x".  Set state to x.  must match enum
+  // returns "ACK" on valid, "NACK" otherwise
+  if (sscanf(buff, "state: %d", &new_state) == 1)  {
+    //Serial.print("Got state "); Serial.println(new_state);
+    if ( new_state < NUM_TIMER_STATES ) {
+      state = new_state;
+      valid = 1;
+      ack();
+    }
+  }
+
+  // "get_state": return the current state
+  // returns "state: x" where x is decimal rep of state
+  if (strncmp(buff,"get_state",9)==0) {
+    Serial.print("state: ");Serial.println(state);
+    valid = 1;
+  }
+
+  if (strncmp(buff,"start_timer",11) == 0) {
+    rx8803_start_counter();
+    ack();
+    valid = 1;
+  }
+  if (strncmp(buff,"stop_timer",10) == 0) {
+    rx8803_stop_counter();
+    ack();
+    valid = 1;
+  }
+  if (strncmp(buff,"get_timer_count",16) == 0) {
+    Serial.print("time: "); Serial.print( rx8803_get_count()/33); Serial.println(" ms");
+    ack();
+    valid = 1;
+  }
+
+
+  if (!valid) {
+    nack();
+  }
+
+  // cleanup
+  reset_buff();
 }
