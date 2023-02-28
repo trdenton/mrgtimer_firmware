@@ -134,7 +134,7 @@ unsigned long last_time;
  ****************/
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(19200);
   // pin configurations:
   pinMode(TIMER_CLK_PIN, INPUT);
   pinMode(STARTER_BUTTON_PIN, INPUT_PULLUP);
