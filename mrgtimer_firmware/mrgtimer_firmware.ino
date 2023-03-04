@@ -12,21 +12,18 @@
 #define WTF(_X_) do {Serial.print("Something weird on ");Serial.print(__LINE__);Serial.print(": ");Serial.println(_X_);} while(0);
 
 #define PULSE_BUFFER_SIZE 16
-#define NUMBER_LANES 1
+#define NUMBER_LANES 2
 
 #define TIMER_CLK_PIN 2
+#define STARTER_BUTTON_PIN 9  // button input
+#define STARTER_LIGHT_PIN 3   // Indicate that the race has started
+#define GATE_LIGHT_PIN 4      // This is what drives the sensor LEDs
 
-#define GATE_LIGHT_PIN 3
-#define STARTER_LIGHT_PIN 4
-#define STARTER_BUTTON_PIN 9
+#define LANE_1_FALSE_START_PIN A0
+#define LANE_2_FALSE_START_PIN A1
 
-#define LIGHT_FALSE_START_PIN 6
-#define LANE_1_FALSE_START_PIN 1
-#define LANE_2_FALSE_START_PIN 2 // TODO i dont think this matches current schem
-
-#define LIGHT_FINISH_PIN 9
-#define LANE_1_FINISH_PIN 1
-#define LANE_2_FINISH_PIN 4
+#define LANE_1_FINISH_PIN A2
+#define LANE_2_FINISH_PIN A3
 
 #define LONG_PRESS_DURATION 2000
 
@@ -645,16 +642,22 @@ void processCommand() {
     valid = 1;
   }
 
+  // "start_timer": start the race timer
+  // resets timer count
   if (strncmp(buff,"start_timer",11) == 0) {
     rx8803_start_counter();
     ack();
     valid = 1;
   }
+
+  // "stop_timer": stop the race timer
   if (strncmp(buff,"stop_timer",10) == 0) {
     rx8803_stop_counter();
     ack();
     valid = 1;
   }
+
+  // "get_timer_count": return the current timer count
   if (strncmp(buff,"get_timer_count",16) == 0) {
     Serial.print("time: "); Serial.print( rx8803_get_count()/33); Serial.println(" ms");
     ack();
