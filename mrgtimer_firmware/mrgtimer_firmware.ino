@@ -751,7 +751,7 @@ void processCommand() {
 
   // "get_timer_count": return the current timer count
   if (strncmp(buff,"get_timer_count",16) == 0) {
-    Serial.print("time: "); Serial.print( rx8803_get_count()/33); Serial.println(" ms");
+    Serial.print("time: "); Serial.print( (rx8803_get_count()*1000)/32768); Serial.println(" ms");
     ack();
     valid = 1;
   }
