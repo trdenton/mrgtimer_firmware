@@ -1,4 +1,5 @@
 #include <string.h>
+#include <limits.h>
 #include "rx8803.h"
 #include "lcd.h"
 
@@ -67,6 +68,11 @@ enum button_state {
   STATE_BUTTON_LONG,
 };
 
+enum win_light_state {
+  STATE_WIN_LIGHT_WAIT,
+  STATE_WIN_LIGHT_WON,
+};
+
 struct discrete_input {
   long debounce_delay;
   bool last_value;
@@ -95,7 +101,7 @@ struct race_lane {
   struct analog_gate false_start_sensor;
   struct analog_gate finish_line_sensor;
   int reaction_time;
-  int finish_time;
+  long unsigned int finish_time;
   char title;
 };
 
@@ -118,6 +124,7 @@ char* c = new char[80];
 //struct analog_gate *analog_gates[ANALOG_CHANNEL_COUNT];
 
 enum timer_state state;
+enum win_light_state win_state;
 
 unsigned long step_time;
 bool test_last_value = false;
@@ -213,6 +220,7 @@ void setup() {
   lane[0].title = '1';
 
   last_time = micros();
+  winLightReset();
   lcd_message("MRGTimer v0.1");
   delay(3000);
 }
@@ -246,6 +254,7 @@ void loop() {
   //State machine processing.
   //*************************************************
   if (STATE_IDLE == state) {
+    winLightReset();
     digitalWrite(STARTER_LIGHT_PIN, HIGH);
     start_button.long_presses = 0;
     start_button.short_presses = 0;
@@ -335,7 +344,7 @@ void loop() {
 
     for (int i = 0; i < NUMBER_LANES; i++ ) {
       lane[i].reaction_time = -1;
-      lane[i].finish_time = -1;
+      lane[i].finish_time = ULONG_MAX;
     }
 
     state = STATE_RUNNING_WAIT;
@@ -343,6 +352,7 @@ void loop() {
 
     // drop the flag.
     digitalWrite(STARTER_LIGHT_PIN, LOW);
+    rx8803_start_counter();
   }
 
   else if (STATE_RUNNING_WAIT == state) {
@@ -370,18 +380,21 @@ void loop() {
       // Serial.println(c);
 
       if (0 == lane[i].finish_line_sensor.value) {
-        if (-1 == lane[i].finish_time) {
-          lane[i].finish_time = lane[i].finish_line_sensor.break_time - step_time;
-          sprintf(c, "Lane %c finished in %d ms", lane[i].title, lane[i].finish_time);
+        if (ULONG_MAX == lane[i].finish_time) {
+          lane[i].finish_time = rx8803_get_count();
+          winLightLatch(i);
+          sprintf(c, "Lane %c: %d ms", lane[i].title, lane[i].finish_time);
           Serial.println(c);
+          lcd_result(i, lane[i].finish_time);
         }
       }
 
-      if (-1 == lane[i].finish_time) {
+      if (ULONG_MAX == lane[i].finish_time) {
         done = false;
       }
     }
     if (done) {
+      rx8803_stop_counter();
       state = STATE_FINISHED;
     }
   }
@@ -585,6 +598,19 @@ void debounce(struct discrete_input *di) {
   di->last_value = b;
 }
 
+// only turn on the winning late e.g. this is stateful
+void winLightLatch(int i) {
+  if (win_state == STATE_WIN_LIGHT_WAIT) {
+    win_state = STATE_WIN_LIGHT_WON;
+    digitalWrite( (i == 0) ? LANE_1_WIN_LIGHT_PIN : LANE_2_WIN_LIGHT_PIN , HIGH);
+  }
+}
+
+void winLightReset() {
+  win_state = STATE_WIN_LIGHT_WAIT;
+  digitalWrite(LANE_1_WIN_LIGHT_PIN, LOW);
+  digitalWrite(LANE_2_WIN_LIGHT_PIN, LOW);
+}
 
 // every command must be one line
 void serialEvent() {
@@ -648,7 +674,7 @@ void processCommand() {
   if (sscanf(buff, "start_light %d ", &light_state) == 1)  {
     //Serial.print("Got state "); Serial.println(new_state);
     if ( light_state == 1 || light_state == 0) {
-      digitalWrite(STARTER_LIGHT_PIN, (light_state == 1) ? LOW : HIGH);
+      digitalWrite(STARTER_LIGHT_PIN, (light_state == 1) ? HIGH : LOW);
       valid = 1;
       ack();
     }
@@ -659,7 +685,7 @@ void processCommand() {
   if (sscanf(buff, "win_light %d %d", &lane, &light_state) == 2)  {
     if ((lane == 0 || lane == 1 ) && (light_state == 1 || light_state == 0)) {
       digitalWrite((lane == 0) ? LANE_1_WIN_LIGHT_PIN : LANE_2_WIN_LIGHT_PIN,
-                   (light_state == 1) ? LOW : HIGH);
+                   (light_state == 1) ? HIGH : LOW);
       valid = 1;
       ack();
     }

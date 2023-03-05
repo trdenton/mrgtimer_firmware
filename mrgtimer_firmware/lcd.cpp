@@ -50,3 +50,9 @@ void lcd_message(const char* str)
 
   last = str;
 }
+
+// print the result for lane (lane 0 is row 0, lane 1 is row 1)
+void lcd_result(int lane, long unsigned int ms) {
+  lcd.setCursor(0,lane);
+  lcd.print("L"); lcd.print(lane+1); lcd.print(": "); lcd_print_time(ms);
+}

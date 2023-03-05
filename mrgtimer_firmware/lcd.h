@@ -6,4 +6,5 @@ long unsigned int lcd_print_time(long unsigned int t);
 void lcd_init();
 void lcd_clear();
 void lcd_message(const char* str);
+void lcd_result(int lane, long unsigned int ms);
 #endif
