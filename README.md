@@ -43,3 +43,10 @@ now you can use the following:
 make verify
 make upload
 
+
+# Known Issues
+
+Pins A6 and A7 cannot be used as outputs - these drive the finish lights
+
+possible workaround: patch S0 and S1 to A6 and A7 respectively, drive those pins instead.
+would lose SPI ability though.
