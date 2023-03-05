@@ -26,8 +26,8 @@
 #define LANE_1_FINISH_PIN A2
 #define LANE_2_FINISH_PIN A3
 
-#define LANE_1_WIN_LIGHT_PIN A6
-#define LANE_2_WIN_LIGHT_PIN A7
+#define LANE_1_WIN_LIGHT_PIN A6 // BUG: A6 cannot output :(
+#define LANE_2_WIN_LIGHT_PIN A7 // BUG: A7 cannot output :(
 
 #define LONG_PRESS_DURATION 2000
 
@@ -245,7 +245,8 @@ void loop() {
   }
 
   //flip the light.
-  light_state = !light_state && state != STATE_IDLE_WAIT;
+  // could this be done with PWM?
+  light_state = !light_state && (state != STATE_IDLE_WAIT);
   digitalWrite(GATE_LIGHT_PIN, light_state);
   delay(1); //wait for the light to come on **IMPORTANT**
 
@@ -684,11 +685,23 @@ void processCommand() {
   // returns "ACK" on valid, "NACK" otherwise
   if (sscanf(buff, "win_light %d %d", &lane, &light_state) == 2)  {
     if ((lane == 0 || lane == 1 ) && (light_state == 1 || light_state == 0)) {
+      //Serial.print("lane: "); Serial.println(lane);
+      //Serial.print("light_state: "); Serial.println(light_state);
       digitalWrite((lane == 0) ? LANE_1_WIN_LIGHT_PIN : LANE_2_WIN_LIGHT_PIN,
                    (light_state == 1) ? HIGH : LOW);
       valid = 1;
       ack();
     }
+  }
+
+  // "beams": return beam readings
+  // returns "a b c d" for beam detect l1start l1end l2start l2end as decimals
+  if (strncmp(buff,"beams",5)==0) {
+    Serial.print(analogRead(LANE_1_FALSE_START_PIN)); Serial.print(" ");
+    Serial.print(analogRead(LANE_1_FINISH_PIN)); Serial.print(" ");
+    Serial.print(analogRead(LANE_2_FALSE_START_PIN)); Serial.print(" ");
+    Serial.println(analogRead(LANE_2_FINISH_PIN));
+    valid = 1;
   }
 
 
