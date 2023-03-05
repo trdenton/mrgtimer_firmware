@@ -352,6 +352,7 @@ void loop() {
     step_time = millis();
 
     // drop the flag.
+    lcd_clear();
     digitalWrite(STARTER_LIGHT_PIN, LOW);
     rx8803_start_counter();
   }
@@ -659,6 +660,8 @@ void processCommand() {
   
   int lane, light_state;
 
+  unsigned long int ms;
+
   // "state x".  Set state to x.  must match enum
   // returns "ACK" on valid, "NACK" otherwise
   if (sscanf(buff, "state %d", &new_state) == 1)  {
@@ -689,6 +692,16 @@ void processCommand() {
       //Serial.print("light_state: "); Serial.println(light_state);
       digitalWrite((lane == 0) ? LANE_1_WIN_LIGHT_PIN : LANE_2_WIN_LIGHT_PIN,
                    (light_state == 1) ? HIGH : LOW);
+      valid = 1;
+      ack();
+    }
+  }
+
+  // "lcd_result x y".  show lane result (lane, 0 or 1), ms
+  // returns "ACK" on valid, "NACK" otherwise
+  if (sscanf(buff, "lcd_result %d %lu", &lane, &ms) == 2)  {
+    if ((lane == 0 || lane == 1 )) {
+      lcd_result(lane,ms);
       valid = 1;
       ack();
     }
@@ -727,6 +740,14 @@ void processCommand() {
     ack();
     valid = 1;
   }
+
+  // "lcd_clear": stop the race timer
+  if (strncmp(buff,"lcd_clear",9) == 0) {
+    lcd_clear();
+    ack();
+    valid = 1;
+  }
+
 
   // "get_timer_count": return the current timer count
   if (strncmp(buff,"get_timer_count",16) == 0) {

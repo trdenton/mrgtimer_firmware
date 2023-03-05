@@ -9,9 +9,10 @@ static DFRobot_RGBLCD1602 lcd(16, 2); // 16 characters x 2 lines
 long unsigned int lcd_print_time(long unsigned int t)
 {
   // 32768 counts is one second
+  // 32.768 is one millisecond
   int minutes = t / (32768*60);
   int seconds = (t/ 32768)%60;
-  int milliseconds = (t/33)%1000;
+  int milliseconds = ((t*1000)/32768)%1000;
   if (minutes < 10)
     lcd.print("0");
   lcd.print(minutes); lcd.print(":"); 
