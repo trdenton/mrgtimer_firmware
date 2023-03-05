@@ -25,6 +25,9 @@
 #define LANE_1_FINISH_PIN A2
 #define LANE_2_FINISH_PIN A3
 
+#define LANE_1_WIN_LIGHT_PIN A6
+#define LANE_2_WIN_LIGHT_PIN A7
+
 #define LONG_PRESS_DURATION 2000
 
 //Debug symbols.
@@ -179,6 +182,9 @@ void setup() {
 
   pinMode(GATE_LIGHT_PIN, OUTPUT);
   pinMode(STARTER_LIGHT_PIN, OUTPUT);
+  pinMode(LANE_1_WIN_LIGHT_PIN, OUTPUT);
+  pinMode(LANE_2_WIN_LIGHT_PIN, OUTPUT);
+
 
   rx8803_init(TIMER_CLK_PIN);
   lcd_init();
@@ -623,10 +629,12 @@ void reset_buff() {
 void processCommand() {
   int new_state = 0;
   int valid = 0;
+  
+  int lane, light_state;
 
-  // "state: x".  Set state to x.  must match enum
+  // "state x".  Set state to x.  must match enum
   // returns "ACK" on valid, "NACK" otherwise
-  if (sscanf(buff, "state: %d", &new_state) == 1)  {
+  if (sscanf(buff, "state %d", &new_state) == 1)  {
     //Serial.print("Got state "); Serial.println(new_state);
     if ( new_state < NUM_TIMER_STATES ) {
       state = new_state;
@@ -635,10 +643,34 @@ void processCommand() {
     }
   }
 
+  // "start_light x ".  Set start light state (0 = off, 1 = on)
+  // returns "ACK" on valid, "NACK" otherwise
+  if (sscanf(buff, "start_light %d ", &light_state) == 1)  {
+    //Serial.print("Got state "); Serial.println(new_state);
+    if ( light_state == 1 || light_state == 0) {
+      digitalWrite(STARTER_LIGHT_PIN, (light_state == 1) ? LOW : HIGH);
+      valid = 1;
+      ack();
+    }
+  }
+
+  // "win_light x y".  Set win light state x (lane, 0 or 1) to y (0 = off, 1 = on)
+  // returns "ACK" on valid, "NACK" otherwise
+  if (sscanf(buff, "win_light %d %d", &lane, &light_state) == 2)  {
+    if ((lane == 0 || lane == 1 ) && (light_state == 1 || light_state == 0)) {
+      digitalWrite((lane == 0) ? LANE_1_WIN_LIGHT_PIN : LANE_2_WIN_LIGHT_PIN,
+                   (light_state == 1) ? LOW : HIGH);
+      valid = 1;
+      ack();
+    }
+  }
+
+
+
   // "get_state": return the current state
-  // returns "state: x" where x is decimal rep of state
+  // returns "state x" where x is decimal rep of state
   if (strncmp(buff,"get_state",9)==0) {
-    Serial.print("state: ");Serial.println(state);
+    Serial.print("state ");Serial.println(state);
     valid = 1;
   }
 
