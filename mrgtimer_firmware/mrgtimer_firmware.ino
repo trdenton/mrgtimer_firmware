@@ -17,7 +17,7 @@
 
 #define TIMER_CLK_PIN 2
 #define STARTER_BUTTON_PIN 9  // button input
-#define STARTER_LIGHT_PIN 3   // Indicate that the race has started
+#define STARTER_LIGHT_PIN 3   // This is the inhibit signal that stops car from moving
 #define GATE_LIGHT_PIN 4      // This is what drives the sensor LEDs
 
 #define LANE_1_FALSE_START_PIN A0
@@ -119,6 +119,7 @@ char buff[RX_BUFF_LEN] = {0};
 int buff_idx = 0;
 
 race_lane lane[NUMBER_LANES];
+
 char* c = new char[80];
 
 //struct analog_gate *analog_gates[ANALOG_CHANNEL_COUNT];
@@ -218,6 +219,20 @@ void setup() {
   lane[0].finish_line_sensor.gate = 'f';
 
   lane[0].title = '1';
+  
+  lane[1].false_start_sensor.pin = LANE_2_FALSE_START_PIN;
+  lane[1].false_start_sensor.pulse_index = 0;
+  lane[1].false_start_sensor.value = true;
+  lane[1].false_start_sensor.threshold = 0;
+  lane[1].false_start_sensor.gate = 's';
+
+  lane[1].finish_line_sensor.pin = LANE_2_FINISH_PIN;
+  lane[1].finish_line_sensor.pulse_index = 0;
+  lane[1].finish_line_sensor.value = true;
+  lane[1].finish_line_sensor.threshold = 0;
+  lane[1].finish_line_sensor.gate = 'f';
+
+  lane[1].title = '2';
 
   last_time = micros();
   winLightReset();
@@ -266,7 +281,6 @@ void loop() {
 
   else if (STATE_IDLE_WAIT == state) {
     if (0 < start_button.short_presses) {
-      lcd_message("Calibrating...");
       // Start button pressed, transition to the starting state
 
       state = STATE_CALIBRATE_ANALOG;
@@ -275,6 +289,7 @@ void loop() {
   }
 
   else if (STATE_CALIBRATE_ANALOG == state) {
+    lcd_message("Calibrating...");
     cycle++;
     if (cycle > PULSE_BUFFER_SIZE) {
       for (int i = 0; i < NUMBER_LANES; i++ ) {
@@ -282,6 +297,7 @@ void loop() {
         calibrateAnalog(&lane[i].false_start_sensor);
       }
       state = STATE_STARTING;
+      lcd_message("Cal complete");
       step_time = millis();
     }
   }
@@ -310,6 +326,7 @@ void loop() {
       step_time = random(3000, 5000); // This is when the race will start.[]6
       state = STATE_STARTING_WAIT;
       sprintf(c, "Start delay is %i ms", step_time);
+      lcd_message(c);
       Serial.println(c);
       step_time += millis();
 
@@ -317,6 +334,7 @@ void loop() {
       if (millis() > step_time) {
         state = STATE_PRE_START_FAILED;
         Serial.println("STATE: STATE_STARTING - Sensors not reading correctly");
+        lcd_message("Sensors are weird :(");
         //Write a handy message detailing why we failed.
       }
     }
@@ -335,11 +353,13 @@ void loop() {
         sprintf(c, "Lane: %c FALSE START", lane[i].title);
         Serial.println(c);
         state = STATE_FALSE_START;
+        lcd_message(c);
       }
     }
   }
 
   else if (STATE_RUNNING == state) {
+    lcd_message("GO!!!!!");
     start_button.long_presses = 0;
     start_button.short_presses = 0;
 
