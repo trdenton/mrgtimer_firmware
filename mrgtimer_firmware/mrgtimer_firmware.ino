@@ -32,11 +32,11 @@
 #define LONG_PRESS_DURATION 2000
 
 //Debug symbols.
-#define DEBUG 0
+#define DEBUG 1
 #define LOG_DEBUG 9
 #define LOG_EVENTS 8
 
-#define RX_BUFF_LEN (256)
+#define RX_BUFF_LEN (64)
 
 /**************************
  *
@@ -55,18 +55,18 @@ enum timer_state {
   STATE_PRE_START_FAILED, // 7
   STATE_FALSE_START,      // 8
   STATE_FINISHED,         // 9
-  STATE_FINISHED_WAIT,    // 10
+  STATE_FINISHED_WAIT,    // 10          
   STATE_TEST_GATE,        // 11
   STATE_TEST_CALIBRATE_ANALOG,  // 12
   STATE_TEST_MONITOR_ANALOG,    // 13
   NUM_TIMER_STATES
 };
 
-enum button_state {
+typedef enum{
   STATE_BUTTON_UP,
   STATE_BUTTON_DOWN,
   STATE_BUTTON_LONG,
-};
+} button_state;
 
 enum win_light_state {
   STATE_WIN_LIGHT_WAIT,
@@ -77,9 +77,9 @@ struct discrete_input {
   long debounce_delay;
   bool last_value;
   long count;
-  bool value;
+  //bool value;
   int pin;
-  int state;
+  button_state state;
   int short_presses;
   int long_presses;
   unsigned long button_down_time;
@@ -183,10 +183,10 @@ void setup() {
   // pin configurations:
   pinMode(TIMER_CLK_PIN, INPUT);
   pinMode(STARTER_BUTTON_PIN, INPUT_PULLUP);
-  pinMode(LANE_1_FALSE_START_PIN, INPUT_PULLUP);
-  pinMode(LANE_2_FALSE_START_PIN, INPUT_PULLUP);
-  pinMode(LANE_1_FINISH_PIN, INPUT_PULLUP);
-  pinMode(LANE_2_FINISH_PIN, INPUT_PULLUP);
+  pinMode(LANE_1_FALSE_START_PIN, INPUT);
+  pinMode(LANE_2_FALSE_START_PIN, INPUT);
+  pinMode(LANE_1_FINISH_PIN, INPUT);
+  pinMode(LANE_2_FINISH_PIN, INPUT);
 
   pinMode(GATE_LIGHT_PIN, OUTPUT);
   pinMode(STARTER_LIGHT_PIN, OUTPUT);
@@ -237,6 +237,7 @@ void setup() {
   last_time = micros();
   winLightReset();
   lcd_message("MRGTimer v0.1");
+  Serial.println("System Reset");
   delay(3000);
 }
 
@@ -570,22 +571,24 @@ void debounce(struct discrete_input *di) {
     di->count = di->debounce_delay;
   }
 
-  // flip the bit if the count exceeds the thresdhold.
+  // flip the bit if the count exceeds the threshold.
   if (STATE_BUTTON_DOWN == di->state) {
-    if (di->debounce_delay == di->count) {
-      di->value = true;
+    // Check for a DOWN->UP transition
+    if (0 == di->count) {
+      //di->value = true;
       if (DEBUG) {
-        sprintf(c, "Pin %i short press", di->pin);
+        sprintf(c, "DOWN->UP: Pin %i short press", di->pin);
         Serial.println(c);
       }
-      di->state = STATE_BUTTON_UP;
       di->short_presses++;
+      di->state = STATE_BUTTON_UP;
     }
 
-    else if (0 == di->count) {
+    // Check for a DOWN->LONG transition
+    else if (di->debounce_delay == di->count) {  
       if (millis() - di->button_down_time > LONG_PRESS_DURATION) {
         if (DEBUG) {
-          sprintf(c, "Pin %i - long press", di->pin);
+          sprintf(c, "DOWN->LONG: Pin %i - long press", di->pin);
           Serial.println(c);
         }
         di->long_presses++;
@@ -595,10 +598,11 @@ void debounce(struct discrete_input *di) {
   }
 
   else if (STATE_BUTTON_UP == di->state) {
-    if (0 == di->count) {
-      di->value = false;
+    // Check for a UP->DOWN transition.
+    if (di->debounce_delay == di->count) {
+      //di->value = false;
       if (DEBUG) {
-        sprintf(c, "Digital pin %i to %d", di->pin, di->value);
+        sprintf(c, "UP->DOWN: Digital pin %i to %d", di->pin, b);
         Serial.println(c);
       }
       di->state = STATE_BUTTON_DOWN;
@@ -607,10 +611,11 @@ void debounce(struct discrete_input *di) {
   }
 
   else if (STATE_BUTTON_LONG == di->state) {
-    if (di->debounce_delay == di->count && !di->value) {
-      di->value = true;
+    // Check for a LONG->UP transition.
+    if (0 == di->count) {
+      //di->value = false;
       if (DEBUG) {
-        sprintf(c, "Digital pin %i to %d", di->pin, di->value);
+        sprintf(c, "LONG->UP: Digital pin %i to %d", di->pin, b);
         Serial.println(c);
       }
       di->state = STATE_BUTTON_UP;
