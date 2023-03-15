@@ -47,20 +47,21 @@
  *************************/
 
 enum timer_state {
-  STATE_IDLE,             // 0
-  STATE_IDLE_WAIT,        // 1
-  STATE_CALIBRATE_ANALOG, // 2
-  STATE_STARTING,         // 3
-  STATE_STARTING_WAIT,    // 4
-  STATE_RUNNING,          // 5
-  STATE_RUNNING_WAIT,     // 6
-  STATE_PRE_START_FAILED, // 7
-  STATE_FALSE_START,      // 8
-  STATE_FINISHED,         // 9
-  STATE_FINISHED_WAIT,    // 10
-  STATE_TEST_GATE,        // 11
-  STATE_TEST_CALIBRATE_ANALOG,  // 12
-  STATE_TEST_MONITOR_ANALOG,    // 13
+  STATE_IDLE,             
+  STATE_IDLE_WAIT,        
+  STATE_CALIBRATE_ANALOG, 
+  STATE_CALIBRATE_SETTLE,
+  STATE_STARTING,         
+  STATE_STARTING_WAIT,    
+  STATE_RUNNING,          
+  STATE_RUNNING_WAIT,     
+  STATE_PRE_START_FAILED, 
+  STATE_FALSE_START,      
+  STATE_FINISHED,         
+  STATE_FINISHED_WAIT,    
+  STATE_TEST_GATE,        
+  STATE_TEST_CALIBRATE_ANALOG,
+  STATE_TEST_MONITOR_ANALOG,
   NUM_TIMER_STATES
 };
 
@@ -149,6 +150,7 @@ const char* states[] = {
   "STATE_IDLE",
   "STATE_IDLE_WAIT",
   "STATE_CALIBRATE_ANALOG",
+  "STATE_CALIBRATE_SETTLE",
   "STATE_STARTING",
   "STATE_STARTING_WAIT",
   "STATE_RUNNING",
@@ -321,8 +323,14 @@ void loop() {
         calibrateAnalog(&lane[i].finish_line_sensor);
         calibrateAnalog(&lane[i].false_start_sensor);
       }
-      state = STATE_STARTING;
+      state = STATE_CALIBRATE_SETTLE;
       step_time = millis();
+    }
+  }
+
+  else if (STATE_CALIBRATE_SETTLE == state) {
+    if(step_time - millis() > 1000){
+      state = STATE_STARTING;
     }
   }
 
