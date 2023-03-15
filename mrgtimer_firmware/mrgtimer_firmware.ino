@@ -45,7 +45,7 @@
  *************************/
 
 enum timer_state {
-  STATE_IDLE,             // 0  
+  STATE_IDLE,             // 0
   STATE_IDLE_WAIT,        // 1
   STATE_CALIBRATE_ANALOG, // 2
   STATE_STARTING,         // 3
@@ -55,7 +55,7 @@ enum timer_state {
   STATE_PRE_START_FAILED, // 7
   STATE_FALSE_START,      // 8
   STATE_FINISHED,         // 9
-  STATE_FINISHED_WAIT,    // 10          
+  STATE_FINISHED_WAIT,    // 10
   STATE_TEST_GATE,        // 11
   STATE_TEST_CALIBRATE_ANALOG,  // 12
   STATE_TEST_MONITOR_ANALOG,    // 13
@@ -219,7 +219,7 @@ void setup() {
   lane[0].finish_line_sensor.gate = 'f';
 
   lane[0].title = '1';
-  
+
   lane[1].false_start_sensor.pin = LANE_2_FALSE_START_PIN;
   lane[1].false_start_sensor.pulse_index = 0;
   lane[1].false_start_sensor.value = true;
@@ -585,7 +585,7 @@ void debounce(struct discrete_input *di) {
     }
 
     // Check for a DOWN->LONG transition
-    else if (di->debounce_delay == di->count) {  
+    else if (di->debounce_delay == di->count) {
       if (millis() - di->button_down_time > LONG_PRESS_DURATION) {
         if (DEBUG) {
           sprintf(c, "DOWN->LONG: Pin %i - long press", di->pin);
@@ -682,7 +682,7 @@ void reset_buff() {
 void processCommand() {
   int new_state = 0;
   int valid = 0;
-  
+
   int lane, light_state;
 
   unsigned long int ms;
