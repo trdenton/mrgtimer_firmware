@@ -31,6 +31,8 @@
 
 #define LONG_PRESS_DURATION 2000
 
+#define ERROR_MESSAGE_MS 5000
+
 //Debug symbols.
 #define DEBUG 1
 #define LOG_DEBUG 9
@@ -298,7 +300,6 @@ void loop() {
         calibrateAnalog(&lane[i].false_start_sensor);
       }
       state = STATE_STARTING;
-      lcd_message("Cal complete");
       step_time = millis();
     }
   }
@@ -333,14 +334,13 @@ void loop() {
 
     } else {
       if (millis() > step_time) {
+        step_time = millis() + ERROR_MESSAGE_MS;
         state = STATE_PRE_START_FAILED;
         Serial.println("STATE: STATE_STARTING - Sensors not reading correctly");
-        lcd_message("Sensors are weird :(");
         //Write a handy message detailing why we failed.
       }
     }
   }
-
   else if (STATE_STARTING_WAIT == state) {
     if (millis() > step_time) {
       // start the race.
@@ -436,8 +436,12 @@ void loop() {
   }
 
   else if (STATE_PRE_START_FAILED == state) {
+    lcd_message("Cal fail :(");
     // Not able to sucessfully see all the light gates.
-    state = STATE_IDLE;
+    // ensure we are displaying the message for a while
+    if (millis() > step_time) {
+      state = STATE_IDLE;
+    }
   }
 
   else if (STATE_FALSE_START == state) {
