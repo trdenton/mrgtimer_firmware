@@ -261,7 +261,12 @@ void loop() {
     switch(state) {
     case STATE_RUNNING:
     case STATE_RUNNING_WAIT:
-      analogMonitor(&(lane[i].finish_line_sensor));
+      // only read start gate if we havnt crossed it yet
+      if (lane[i].reaction_time == -1) {
+        analogMonitor(&(lane[i].false_start_sensor));
+      } else {
+        analogMonitor(&(lane[i].finish_line_sensor));
+      }
       break;
     case STATE_STARTING_WAIT:
       analogMonitor(&(lane[i].false_start_sensor));
