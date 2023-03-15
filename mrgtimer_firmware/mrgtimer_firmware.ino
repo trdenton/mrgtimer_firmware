@@ -418,6 +418,12 @@ void loop() {
     if (done) {
       rx8803_stop_counter();
       state = STATE_FINISHED;
+    } else {
+      int time_row = 0;
+      if (ULONG_MAX != lane[0].finish_time) {
+        time_row = 1;
+      }
+      lcd_elapsed(time_row, rx8803_get_count());
     }
   }
 

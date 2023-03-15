@@ -6,7 +6,7 @@ static DFRobot_RGBLCD1602 lcd(16, 2); // 16 characters x 2 lines
 // assumes cursor is in the correct position
 // converts t to MM:SS.sss
 // assumes we are receiving ticks at 32768 kHz
-long unsigned int lcd_print_time(long unsigned int t)
+void lcd_print_time(long unsigned int t)
 {
   // 32768 counts is one second
   // 32.768 is one millisecond
@@ -26,6 +26,12 @@ long unsigned int lcd_print_time(long unsigned int t)
   if (milliseconds < 10)
     lcd.print("0");
   lcd.print(milliseconds);
+}
+
+// used for printing elapsed time while race is on
+void lcd_elapsed(int row, long unsigned int t) {
+  lcd.setCursor(0, row);
+  lcd_print_time(t);
 }
 
 void lcd_init() 
