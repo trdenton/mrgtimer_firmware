@@ -258,8 +258,25 @@ void loop() {
 
   //condition the inputs.
   for (int i = 0; i < NUMBER_LANES; i++) {
-    analogMonitor(&(lane[i].finish_line_sensor));
-    analogMonitor(&(lane[i].false_start_sensor));
+    switch(state) {
+    case STATE_RUNNING:
+    case STATE_RUNNING_WAIT:
+      analogMonitor(&(lane[i].finish_line_sensor));
+      break;
+    case STATE_STARTING_WAIT:
+      analogMonitor(&(lane[i].false_start_sensor));
+      break;
+    case STATE_STARTING:
+    case STATE_CALIBRATE_ANALOG:
+    case STATE_TEST_GATE:
+    case STATE_TEST_CALIBRATE_ANALOG:
+    case STATE_TEST_MONITOR_ANALOG:
+      analogMonitor(&(lane[i].finish_line_sensor));
+      analogMonitor(&(lane[i].false_start_sensor));
+      break;
+    default:
+      break;
+    }
   }
 
   //flip the light.
@@ -279,7 +296,7 @@ void loop() {
     start_button.short_presses = 0;
 
     state = STATE_IDLE_WAIT;
-    lcd_message("IDLE");
+    lcd_message("Ready");
   }
 
   else if (STATE_IDLE_WAIT == state) {
@@ -454,8 +471,9 @@ void loop() {
 
   else if (STATE_FALSE_START == state) {
     // Somebody jumped the gun.
-    // lcd already has message, just hang around for a while
-    if (millis() > step_time) {
+    // lcd already has message, wait for keypress
+    if (0 < start_button.short_presses) {
+      // Start button pressed, transition to the starting state
       state = STATE_IDLE;
     }
   }
