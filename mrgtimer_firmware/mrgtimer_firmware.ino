@@ -325,10 +325,9 @@ void loop() {
 
     if (b) {
       // All sensors reading correctly
-      step_time = random(3000, 5000); // This is when the race will start.
+      step_time = random(3, 5)*1000; // This is when the race will start.
       state = STATE_STARTING_WAIT;
       sprintf(c, "Start delay is %i ms", step_time);
-      lcd_message(c);
       Serial.println(c);
       step_time += millis();
 
@@ -344,6 +343,10 @@ void loop() {
     if (millis() > step_time) {
       // start the race.
       state = STATE_RUNNING;
+    } else {
+      unsigned long countdown = step_time - millis();
+      sprintf(c, "%d...", (1000+countdown)/1000);
+      lcd_message(c);
     }
 
     // on the lookout for false starts.
