@@ -32,6 +32,9 @@ verify:
 sim: ./sim/mrgtimer_firmware.ino.hex
 	$(SIMULIDE) ./sim/mrg.simu
 
+.PHONY: sim_fw
+sim_fw: ./sim/mrgtimer_firmware.ino.hex
+
 ./sim/mrgtimer_firmware.ino.hex: mrgtimer_firmware/mrgtimer_firmware.ino mrgtimer_firmware/lcd.cpp mrgtimer_firmware/lcd.h mrgtimer_firmware/rx8803.cpp mrgtimer_firmware/rx8803.h
 	$(ACLI) compile --fqbn arduino:avr:nano mrgtimer_firmware --output-dir=./sim
 
