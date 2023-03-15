@@ -210,13 +210,13 @@ void setup() {
 
   lane[0].false_start_sensor.pin = LANE_1_FALSE_START_PIN;
   lane[0].false_start_sensor.pulse_index = 0;
-  lane[0].false_start_sensor.value = true;
+  lane[0].false_start_sensor.value = 0;
   lane[0].false_start_sensor.threshold = 0;
   lane[0].false_start_sensor.gate = 's';
 
   lane[0].finish_line_sensor.pin = LANE_1_FINISH_PIN;
   lane[0].finish_line_sensor.pulse_index = 0;
-  lane[0].finish_line_sensor.value = true;
+  lane[0].finish_line_sensor.value = 0;
   lane[0].finish_line_sensor.threshold = 0;
   lane[0].finish_line_sensor.gate = 'f';
 
@@ -224,13 +224,13 @@ void setup() {
 
   lane[1].false_start_sensor.pin = LANE_2_FALSE_START_PIN;
   lane[1].false_start_sensor.pulse_index = 0;
-  lane[1].false_start_sensor.value = true;
+  lane[1].false_start_sensor.value = 0;
   lane[1].false_start_sensor.threshold = 0;
   lane[1].false_start_sensor.gate = 's';
 
   lane[1].finish_line_sensor.pin = LANE_2_FINISH_PIN;
   lane[1].finish_line_sensor.pulse_index = 0;
-  lane[1].finish_line_sensor.value = true;
+  lane[1].finish_line_sensor.value = 0;
   lane[1].finish_line_sensor.threshold = 0;
   lane[1].finish_line_sensor.gate = 'f';
 
@@ -293,7 +293,7 @@ void loop() {
 
   else if (STATE_CALIBRATE_ANALOG == state) {
     lcd_message("Calibrating...");
-    cycle++;
+    cycle++; // number of cycles/samples collected
     if (cycle > PULSE_BUFFER_SIZE) {
       for (int i = 0; i < NUMBER_LANES; i++ ) {
         calibrateAnalog(&lane[i].finish_line_sensor);
@@ -325,7 +325,7 @@ void loop() {
 
     if (b) {
       // All sensors reading correctly
-      step_time = random(3000, 5000); // This is when the race will start.[]6
+      step_time = random(3000, 5000); // This is when the race will start.
       state = STATE_STARTING_WAIT;
       sprintf(c, "Start delay is %i ms", step_time);
       lcd_message(c);
