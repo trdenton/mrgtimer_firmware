@@ -350,7 +350,7 @@ void loop() {
     for (int i = 0; i < NUMBER_LANES; i++ ) {
       if (0 == lane[i].false_start_sensor.value) {
         //print a message indicating false start
-        sprintf(c, "Lane: %c FALSE START", lane[i].title);
+        sprintf(c, "L%c FALSE START", lane[i].title);
         Serial.println(c);
         state = STATE_FALSE_START;
         step_time = millis() + ERROR_MESSAGE_MS;
