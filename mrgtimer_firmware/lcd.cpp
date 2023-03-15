@@ -40,16 +40,17 @@ void lcd_clear()
 
 void lcd_message(const char* str)
 {
+  static char last[16] = "";
   // basic mechanism to not spam LCD with
   // same message
-  static const char* last = NULL;
-  if ( last != str ) {
+
+  if ( strncmp(str,last,16) ) {
     lcd.clear();
     lcd.setCursor(0,1);
     lcd.print(str);
   }
 
-  last = str;
+  strncpy(last,str,16);
 }
 
 // print the result for lane (lane 0 is row 0, lane 1 is row 1)

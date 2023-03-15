@@ -337,7 +337,6 @@ void loop() {
         step_time = millis() + ERROR_MESSAGE_MS;
         state = STATE_PRE_START_FAILED;
         Serial.println("STATE: STATE_STARTING - Sensors not reading correctly");
-        //Write a handy message detailing why we failed.
       }
     }
   }
@@ -354,6 +353,7 @@ void loop() {
         sprintf(c, "Lane: %c FALSE START", lane[i].title);
         Serial.println(c);
         state = STATE_FALSE_START;
+        step_time = millis() + ERROR_MESSAGE_MS;
         lcd_message(c);
       }
     }
@@ -373,7 +373,6 @@ void loop() {
     step_time = millis();
 
     // drop the flag.
-    lcd_clear();
     digitalWrite(STARTER_LIGHT_PIN, LOW);
     rx8803_start_counter();
   }
@@ -446,7 +445,10 @@ void loop() {
 
   else if (STATE_FALSE_START == state) {
     // Somebody jumped the gun.
-    state = STATE_IDLE;
+    // lcd already has message, just hang around for a while
+    if (millis() > step_time) {
+      state = STATE_IDLE;
+    }
   }
 
   // this is populated by serialEvent()
