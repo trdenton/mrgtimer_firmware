@@ -146,6 +146,7 @@ volatile bool light_state = false;
 
 unsigned long sweep_time;
 unsigned long last_time;
+unsigned long last_lcd_update;
 
 //const char* states[] = {
 //  "STATE_IDLE",
@@ -299,7 +300,6 @@ void loop() {
       case STATE_TEST_GATE:
       case STATE_TEST_CALIBRATE_ANALOG:
       case STATE_TEST_MONITOR_ANALOG:
-      case STATE_STARTUP_CALIBRATE:
         analogMonitor(&(lane[i].finish_line_sensor));
         analogMonitor(&(lane[i].false_start_sensor));
         break;
@@ -463,6 +463,7 @@ void loop() {
     // drop the flag.
     digitalWrite(STARTER_LIGHT_PIN, LOW);
     rx8803_start_counter();
+    last_lcd_update = 0;
   }
 
   else if (STATE_RUNNING_WAIT == state) {
@@ -501,7 +502,10 @@ void loop() {
       if (ULONG_MAX != lane[0].finish_time) {
         time_row = 1;
       }
-      lcd_elapsed(time_row, rx8803_get_count());
+      if((millis() - last_lcd_update) > 100){
+        lcd_elapsed(time_row, rx8803_get_count());
+        last_lcd_update = millis();
+      }
     }
   }
 
