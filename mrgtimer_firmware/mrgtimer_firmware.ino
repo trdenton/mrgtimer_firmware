@@ -300,6 +300,7 @@ void loop() {
       case STATE_TEST_GATE:
       case STATE_TEST_CALIBRATE_ANALOG:
       case STATE_TEST_MONITOR_ANALOG:
+      case STATE_STARTUP_CALIBRATE: +
         analogMonitor(&(lane[i].finish_line_sensor));
         analogMonitor(&(lane[i].false_start_sensor));
         break;
