@@ -300,7 +300,6 @@ void loop() {
       case STATE_TEST_GATE:
       case STATE_TEST_CALIBRATE_ANALOG:
       case STATE_TEST_MONITOR_ANALOG:
-      case STATE_STARTUP_CALIBRATE: +
         analogMonitor(&(lane[i].finish_line_sensor));
         analogMonitor(&(lane[i].false_start_sensor));
         break;
@@ -328,7 +327,9 @@ void loop() {
     state = STATE_IDLE_WAIT;
     Serial.println("STATE: STATE_IDLE_WAIT");
     
+    digitalWrite(STARTER_LIGHT_PIN, HIGH);
     lcd_message("Ready");
+    
   }
 
   else if (STATE_IDLE_WAIT == state) {
