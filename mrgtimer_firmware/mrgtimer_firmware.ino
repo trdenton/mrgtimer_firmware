@@ -328,7 +328,9 @@ void loop() {
     state = STATE_IDLE_WAIT;
     Serial.println("STATE: STATE_IDLE_WAIT");
     
+    digitalWrite(STARTER_LIGHT_PIN, HIGH);
     lcd_message("Ready");
+    
   }
 
   else if (STATE_IDLE_WAIT == state) {
