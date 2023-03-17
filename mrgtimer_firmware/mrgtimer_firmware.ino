@@ -300,7 +300,6 @@ void loop() {
       case STATE_TEST_GATE:
       case STATE_TEST_CALIBRATE_ANALOG:
       case STATE_TEST_MONITOR_ANALOG:
-      case STATE_STARTUP_CALIBRATE: +
         analogMonitor(&(lane[i].finish_line_sensor));
         analogMonitor(&(lane[i].false_start_sensor));
         break;
@@ -322,6 +321,7 @@ void loop() {
   
   if (STATE_IDLE == state) {
     winLightReset();
+    digitalWrite(STARTER_LIGHT_PIN, HIGH);
     start_button.long_presses = 0;
     start_button.short_presses = 0;
 
